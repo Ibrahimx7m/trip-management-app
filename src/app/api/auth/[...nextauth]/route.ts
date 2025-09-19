@@ -1,21 +1,11 @@
-import NextAuth from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import NextAuth from 'next-auth'
 
-const handler = NextAuth(authOptions);
+const handler = NextAuth({
+  providers: [],
+  pages: {
+    signIn: '/login',
+  },
+  secret: process.env.NEXTAUTH_SECRET,
+})
 
-export { handler as GET, handler as POST };
-
-// Types
-declare module 'next-auth' {
-  interface Session {
-    user: {
-      id: string;
-      name: string;
-      email: string;
-      role: string;
-      permissions: string[];
-      phone: string;
-      avatar: string;
-    };
-  }
-}
+export { handler as GET, handler as POST }

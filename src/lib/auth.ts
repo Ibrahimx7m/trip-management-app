@@ -1,14 +1,4 @@
 // Enhanced authentication system for Nukhbat Al-Naql
-import CredentialsProvider from 'next-auth/providers/credentials';
-
-// Define NextAuthOptions type locally to avoid import issues
-interface NextAuthOptions {
-  providers: any[];
-  callbacks?: any;
-  pages?: any;
-  session?: any;
-  secret?: string;
-}
 
 export interface User {
   id: string;
@@ -92,80 +82,7 @@ const mockPasswords: Record<string, string> = {
   'operator@nukhbat-naql.sa': 'operator123'
 };
 
-export const authOptions: NextAuthOptions = {
-  providers: [
-    CredentialsProvider({
-      name: 'credentials',
-      credentials: {
-        email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' }
-      },
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          throw new Error('البريد الإلكتروني وكلمة المرور مطلوبان');
-        }
-
-        // Find user by email
-        const user = mockUsers.find(u => u.email === credentials.email);
-        if (!user) {
-          throw new Error('البريد الإلكتروني غير مسجل');
-        }
-
-        // Check password
-        const validPassword = mockPasswords[credentials.email as keyof typeof mockPasswords] === credentials.password;
-        if (!validPassword) {
-          throw new Error('كلمة المرور غير صحيحة');
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-          avatar: user.avatar,
-          phone: user.phone,
-          permissions: user.permissions
-        } as any;
-      }
-    })
-  ],
-  callbacks: {
-    async jwt({ token, user }: { token: any; user: any }) {
-      if (user) {
-        token.role = user.role;
-        token.permissions = user.permissions;
-        token.phone = user.phone;
-        token.avatar = user.avatar;
-      }
-      return token;
-    },
-    async session({ session, token }: { session: any; token: any }) {
-      if (token) {
-        session.user.id = token.sub!;
-        session.user.role = token.role as string;
-        session.user.permissions = token.permissions as string[];
-        session.user.phone = token.phone as string;
-        session.user.avatar = token.avatar as string;
-      }
-      return session;
-    },
-    async redirect({ url, baseUrl }: { url: any; baseUrl: any }) {
-      // Redirect based on user role after login
-      if (url.startsWith('/')) return `${baseUrl}${url}`;
-      else if (new URL(url).origin === baseUrl) return url;
-      return baseUrl;
-    }
-  },
-  pages: {
-    signIn: '/login',
-    error: '/login',
-  },
-  session: {
-    strategy: 'jwt',
-    maxAge: 24 * 60 * 60, // 24 hours
-  },
-  secret: process.env.NEXTAUTH_SECRET || 'nukhbat-naql-secret-key'
-};
+// Simple authentication helper functions
 
 // Helper functions for role-based access control
 export const hasPermission = (userPermissions: string[], requiredPermission: string): boolean => {

@@ -4,6 +4,7 @@ import { LanguageProvider } from '@/app/providers/lang-provider';
 import { AuthProvider } from '@/app/providers/session-provider';
 import { TranslationProvider } from '@/app/providers/translation-provider';
 import { metadata, siteConfig, viewport } from '@/configs/site';
+import { Toaster } from '@/components/ui/toaster';
 
 export { metadata, viewport };
 
@@ -21,6 +22,7 @@ export default function RootLayout({
           <AuthProvider>
             <LanguageProvider>
               <Providers>{children}</Providers>
+              <Toaster />
             </LanguageProvider>
           </AuthProvider>
         </TranslationProvider>
